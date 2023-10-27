@@ -3,7 +3,7 @@ let context = canvas.getContext("2d");
 let controller = new ScrollMagic.Controller();
 let inner = document.querySelector(".inner-content");
 let innerEnd = document.querySelector(".inner-content-end");
-const frameCount = 3; // Assuming you have 3 images
+const frameCount = 3;
 
 // Get Current Image
 const currentFrame = (index) =>
