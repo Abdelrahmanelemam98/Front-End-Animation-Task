@@ -3,20 +3,19 @@ let context = canvas.getContext("2d");
 let controller = new ScrollMagic.Controller();
 let inner = document.querySelector(".inner-content");
 let innerEnd = document.querySelector(".inner-content-end");
-let frameCount = 148;
+const frameCount = 3; // Assuming you have 3 images
 
 // Get Current Image
-let currentFrame = (index) =>
-  `https://www.apple.com/105/media/us/airpods-pro/2019/1299e2f5_9206_4470_b28e_08307a42f19b/anim/sequence/large/01-hero-lightpass/${index
-    .toString()
-    .padStart(4, "0")}.jpg`;
+const currentFrame = (index) =>
+  `assets/${index.toString().padStart(4, "0")}.jpg`;
 
 // Set Image and Draw it
-let img = new Image();
+const img = new Image();
 canvas.width = 1158;
 canvas.height = 770;
 
-const updateImage = (index) => {
+// Initialize the image load and drawing function
+const loadAndDrawImage = (index) => {
   img.src = currentFrame(index);
   img.onload = function () {
     context.drawImage(img, 0, 0);
@@ -26,14 +25,12 @@ const updateImage = (index) => {
 // Preload Images
 const preloadImages = () => {
   for (let i = 1; i <= frameCount; i++) {
-    const img = new Image();
-    img.src = currentFrame(i);
+    loadAndDrawImage(i);
   }
 };
 
 preloadImages();
 
-// Function to update the image and reveal the text
 const updateImageAndText = () => {
   const scrollTop = window.scrollY;
   const maxScrollTop =
@@ -41,12 +38,12 @@ const updateImageAndText = () => {
   const scrollFraction = scrollTop / maxScrollTop;
   const frameIndex = Math.min(
     frameCount - 1,
-    Math.ceil(scrollFraction * frameCount)
+    Math.floor(scrollFraction * frameCount)
   );
 
-  updateImage(frameIndex + 1);
+  loadAndDrawImage(frameIndex + 1);
 
-  if (scrollFraction > 0.5) {
+  if (scrollFraction > 0.2) {
     inner.classList.add("show");
     innerEnd.classList.add("show");
   } else {
@@ -55,7 +52,17 @@ const updateImageAndText = () => {
   }
 };
 
-window.addEventListener("scroll", updateImageAndText);
+let animationFrameId = null;
+
+const handleScroll = () => {
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+  }
+
+  animationFrameId = requestAnimationFrame(updateImageAndText);
+};
+
+window.addEventListener("scroll", handleScroll);
 
 new ScrollMagic.Scene({
   duration: 9000,
